@@ -766,9 +766,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!(
         "{}",
         serde_json::to_string(&json!({
-            "application_kappa": shipped.as_ref().map_or(inspection.application_kappa.clone(), |s| s.application_kappa.clone()),
-            "archive_fingerprint": shipped.as_ref().map_or(inspection.archive_fingerprint.clone(), |s| s.archive_fingerprint.clone()),
-            "archive_kappa": shipped.as_ref().map_or(session.archive_kappa().to_string(), |s| s.archive_kappa.clone()),
+            "application_kappa": match &shipped {
+                Some(s) => json!(s.application_kappa),
+                None => json!(inspection.application_kappa),
+            },
+            "archive_fingerprint": match &shipped {
+                Some(s) => json!(s.archive_fingerprint),
+                None => json!(inspection.archive_fingerprint),
+            },
+            "archive_kappa": match &shipped {
+                Some(s) => json!(s.archive_kappa),
+                None => json!(session.archive_kappa()),
+            },
             "direct_vectors": vectors.len(),
             "footer_verified": true,
             "guest_allocation_boundary": "verified",
